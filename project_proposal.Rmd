@@ -1,0 +1,188 @@
+---
+title: "Student Academic Performance Project Proposal"
+subtitle: "Analysis of Factors that contribute to Student Academic Performance"
+author: "Lab Group - Rikki Kendall, Tolulemi Gbile, Geary Stonesifer"
+output: pdf_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, comment = NA, 
+                      message = FALSE, warning = FALSE,
+                      fig.height=6, fig.width = 9, fig.align = "center")
+```
+
+```{r packages}
+library(tidyverse)
+library(infer)
+```
+
+# Data
+
+```{r load_data}
+edu <- read_csv("data/xAPI-Edu-Data.csv")
+
+edu
+```
+
+```{r set_seed}
+set.seed(5768952)
+```
+
+# Section 1 - Introduction
+
+Our general research question is as follows: Is it possible to
+predict a child's class level based off of the information provided
+in the dataset? If so, which variables are of significance? The
+information we're going to be using to unearth the answer to this
+research question is from Kaggle.com. The information was collected
+from a Learning Management System called Kalboard 360. The data is
+collected from a learner activity tracker tool which tracks the
+students behavior, like if they're reading an article, watching an
+informative video, or doing their classwork. The variables used in
+this data set and their data types are as follows:
+
+### Variables 
+
+* Gender - Student's Gender (categorical)
+* Nationality - The student's nationality (categorical)
+* Place of birth - the student's place of birth (categorical)
+* Educational Stage - Elementary, Middle, or High school? (categorical) 
+* Grade Level - Grade student is in (categorical)
+* Section ID - Classroom the student belongs to (categorical) 
+* Topic - Course topic (categorical)
+* Semester - School Semester (discrete numerical)
+* Parent Responsible for Student (categorical)
+* Raised Hand - How many times the student raises their hand in the classroom
+(continuous numerical)
+* Visited Resources - How many times a student uses the course content 
+(continuous numerical)
+* Viewing Announcements - How many times the student checks the new 
+announcements (continuous numerical)
+* Discussion Groups - How many times a student participates in discussion 
+groups (continuous numerical)
+* Parent Answering Survey - Did the parent answer the surveys provided by the
+school? (categorical)
+* Parent School Satisfaction - Is the parent satisfied with the school? 
+(categorical)
+* Student Absence days - How many times the student has missed school 
+(categorical)
+* Class - Low, Medium, or High, depending on their grades/marks at
+the end of the semester 
+(categorical) 
+
+# Section 2 - Data analysis plan
+
+The aim of our project is to attempt to predict a child's class based on 
+relevant variables provided in the data set. In order to do
+so we will be using two different variables: the 'outcome'
+(dependent, response, Y), which is the child's class (L,M,H) and the
+'predictor' (independent, explanatory, X) which can be any
+combination of the aforementioned variables in section 1. 
+
+### Predictor
+
+Explanatory Variables: Any combination of the variables listed above.
+
+### Outcome
+
+Response Variable: Class
+
+### Summary Statistics/Visualizations
+
+In order to attempt to prove that class is predictable, we will run
+several different linear regression models. With the given
+correlations expected, we should be able to extrapolate a child's
+class. However, what is crucial is to pick the most relevant of the
+variables. Initially, we will screen the variables based on
+intuition as to which are obviously not useful in determining class.
+Then we will those that are and run several linear regression
+models.
+
+However, at first to portray the relevance of the variables we have
+provided several visualizations below to learn more about the data: 
+
+The first graph explores the relationship between the instances of
+raised hands and discussion. These two variables, although not
+necessarily dependent on one another, intuitively go hand in hand
+since both variables are related to class participation.
+
+```{r sec2plot1, fig.width=8, fig.height=6}
+
+ggplot(data = edu, 
+       mapping = aes(x = raisedhands, y = Discussion, color = Class)) +
+  geom_point() + 
+  labs(x = "Raised Hands", y = "Discussion", 
+       title = "Visualization of Relationship between Instances of
+       Raised Hands and Discussion") + 
+  theme_minimal(base_size = 11)
+
+```
+Given the disparity in results, whereby lower class is visibly on
+the lower spectrum of both Discussion and Raisedhands these
+variables will be important. 
+
+
+The following visualization corroborates the data in the prior
+scatter-plot for each country. This is to say that there is a clear
+trend among class in various countries given the variable,
+'raisedhands.' 
+
+```{r sec3plot2, fig.width = 8, fig.height = 6}
+ggplot(edu, aes(x = PlaceofBirth, y = raisedhands, fill = Class)) +
+    geom_bar(stat = "identity") +
+    coord_flip() +
+    theme_classic() + 
+  labs(x = "Place of Birth", y = "Raised Hands", 
+       title = "Visualization of Relationship between Instances of
+       Raised Hands and Place of Birth") + 
+  theme_minimal(base_size = 11)
+```
+To continue to explore the variables, the next scatterplot takes two
+more data entries to examine a connection between class and Visited
+Resources / Announcements. 
+
+```{r sec2plot3, fig.width=8, fig.height=6}
+
+ggplot(data = edu, 
+       mapping = aes(x = VisITedResources, y = AnnouncementsView,
+                     color = Class)) + 
+  geom_point() + 
+  labs(x = "Visited Resources", y = "Announcements", 
+       title = "Visualization of Relationship between Visited
+       Resources and Announcements") + 
+  theme_minimal(base_size = 12)
+
+```
+Again, we begin to see some trends when plotting relevant data side
+by side. Even more so in this visualization than the first
+scatter-plot, there is clear distinction between the classes of
+students.
+
+Lastly, I have attempted to draw a connection to class using Parents
+satisfaction to examine a potential relationship with class.
+
+```{r sec2plot4}
+
+ggplot(edu, aes(x = ParentschoolSatisfaction, fill = Class)) +
+    geom_bar(position = position_dodge()) +
+  labs(x = "Parents Satisfaction", y = "Number of Responses", 
+       title = "Visualization of Parents School Satisfaction") + 
+  theme_minimal(base_size = 12)
+
+```
+This data provides interesting insight to the fact that in the
+Higher class bracket, there is a significant reduction in instances
+of negative feedback to any given school. Conversely, it appears the
+lower class bracket more often has negative responses to their
+school. 
+
+Given the visualizations of the variables above, it appears there
+are significant trends in the data that we aim to use to answer our
+research question: Is it possible to predict a child's class level
+based off of the information provided in the dataset?
+
+# Section 3 - Data
+
+```{r}
+glimpse(edu)
+```
